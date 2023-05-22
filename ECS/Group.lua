@@ -1,31 +1,22 @@
+-----------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------
+-- 过滤组
+-- Date - 2023-5-22
+-- by - 良人
+-----------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------
+
 local Group = class("Group")
 
-function Group:ctor()
+function Group:ctor(matcher)
+    self.mEntityIndexer = {}
+
+    
     self.mAllOfIndexer = {}
     self.mNoneOfIndexer = {}
 
     self.mOnAdded = false
     self.mOnRemoved = false
-end
-
-function Group:AllOf(...)
-    
-end
-
-function Group:NoneOf(...)
-    
-end
-
-function Group:Added()
-    
-end
-
-function Group:Removed()
-    
-end
-
-function Group:AddedOrRemoved()
-    
 end
 
 

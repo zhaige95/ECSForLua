@@ -1,12 +1,39 @@
+-----------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------
+-- ECS Context ECS运行环境
+-- Date - 2023-5-22
+-- by - 良人
+-----------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------
+
 local Entity = require("ECS.Entity")
 local Matcher = require("ECS.Matcher")
+local Group = require("ECS.Group")
 
 Context = {
-    mEntityList = {},
+    --- 实体对象回收池
     mEntityList_Recycle = {},
+    --- 组件对象回收池
     mComponentList_Recycle = {},
+
+    --- 实体列表
+    mEntityList = {},
+    --- 过滤组列表
     mGroupList = {},
+    --[[
+        mGroupList = {
+            [onAdd:true] = {
+                [onRemove:true] = { ... }
+            },
+            [onAdd:false] = {
+                [onRemove:true] = { ... }
+            }
+        }
+    ]]
+
+    --- 实体UID，自增
     mEntityUID = 0,
+    --- 匹配器实例，只需要一个
     mMatcher = Matcher.new()
 }
 
@@ -16,15 +43,21 @@ Context = {
 -- Context API
 -----------------------------------------------------------------------------------------------------------------------
 
----获取实体uid
----@return integer UID
-function Context:GetEntityUID()
-    self.mEntityUID = self.mEntityUID + 1
-    return self.mEntityUID
+
+function Context:Init()
+    self.mGroupList[true][true] = {}
+    self.mGroupList[true][false] = {}
+    self.mGroupList[false][false] = {}
+    self.mGroupList[false][true] = {}
 end
 
 
-
+---获取实体uid
+---@return integer UID
+function Context:_GetEntityUID()
+    self.mEntityUID = self.mEntityUID + 1
+    return self.mEntityUID
+end
 
 -----------------------------------------------------------------------------------------------------------------------
 -- Entity 实体相关
@@ -39,11 +72,10 @@ function Context:CreateEntity()
     else
         entity = Entity.new()
     end
-    entity.mUID = self:GetEntityUID()
+    entity.mUID = self:_GetEntityUID()
     self.mEntityList[entity.mUID] = entity
     return entity
 end
-
 
 -----------------------------------------------------------------------------------------------------------------------
 -- Component 组件相关
@@ -60,8 +92,6 @@ function Context:GetComponent(comp_name)
     return self.mComps["TestComponent"].new()
 end
 
-
-
 -----------------------------------------------------------------------------------------------------------------------
 -- System 系统相关
 -----------------------------------------------------------------------------------------------------------------------
@@ -72,22 +102,16 @@ end
 -----------------------------------------------------------------------------------------------------------------------
 
 function Context:Matcher()
-    self.mMatcher:Reset()
+    return self.mMatcher:Reset()
 end
-
 
 function Context:GetGroup(matcher)
+    local group = nil
     
+    if nil == group then
+       group = Group.new(matcher)
+       table.insert(self.mGroupList[group.mOnAdded][group.mOnRemoved], group)
+    end
+
+    return group
 end
-
-
-
-
-
-
-
-
-
-
-
-
