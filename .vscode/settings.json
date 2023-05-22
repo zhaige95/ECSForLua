@@ -1,0 +1,7 @@
+{
+    "Lua.diagnostics.disable": [
+        "lowercase-global",
+        "cast-local-type"
+    ],
+    "workbench.tree.indent": 24
+}
