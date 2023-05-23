@@ -95,6 +95,11 @@ end
 
 function Group:_MatchEntity(e)
     for _, id in pairs(self.mAllOfContent) do
+        if self.mAnyMode == true then
+            if e:HasComponent(id) == true then
+                return true
+            end
+        end
         if e:HasComponent(id) == false then
             return false
         end
