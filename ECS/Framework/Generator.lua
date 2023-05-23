@@ -1,14 +1,17 @@
 --============================================================================================
 -- ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓
+require("lfs")
 
 local process = {
-    TestComponent = "ECS.Game.Test.TestComponent"
+    TestComponent = "ECS\\Game\\Test\\TestComponent.lua",
+    MoveComponent = "ECS\\Game\\Move\\MoveComponent.lua",
 
 }
 
 
 -- ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑
 --============================================================================================
+
 require("Core.functions")
 local generate_path = 'ECS\\Generated\\Components\\Game'
 
@@ -34,10 +37,10 @@ local entity_extention = {}
 ---------------------------------------------------------------------------------------
 print("----------- 生成GameComponent代码 -----------------------------------------------")
 
-for name, comp in pairs(process) do
+for name, path in pairs(process) do
+    local comp = path:gsub('\\', '.')
+    comp = comp:gsub('.lua', '')
     local script = require(comp)
-    local path, _ = string.gsub(comp, '%.', '\\')
-    path = path .. '.lua'
 
     local file = io.open(path, "r")
     assert(file, "read file is nil")
@@ -112,6 +115,7 @@ print("----------- 生成GameEntity代码 --------------------------------------
 local entity_path = "ECS\\Generated\\GameEntity.lua"
 local code_entity = [[
 
+--========= [Name] ========================================================================
 function GameEntity:Add[PName]([Param])
     self.[PName] = Context:_GetComponent(GameComponentLookUp.[Name])
     self.[PName]:Init([Param])
@@ -119,12 +123,15 @@ function GameEntity:Add[PName]([Param])
     Context:_OnAddComponent(self, self.[PName])
 end
 
-function GameEntity:RemoveTest()
+function GameEntity:Remove[PName]()
     self:_OnRemoveComponent(self.[PName])
     Context:_OnRemoveComponent(self, self.[PName])
     self.[PName] = nil
 end
 
+function GameEntity:Has[PName]()
+    return self:HasComponent(GameComponentLookUp.[Name])
+end
 ]]
 
 local builder_entity = [[
@@ -142,7 +149,9 @@ for key, value in pairs(entity_extention) do
 end
 
 builder_entity = builder_entity .. [[
-return GameEntity]]
+
+return GameEntity
+]]
 
 print(builder_entity)
 
