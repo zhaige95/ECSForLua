@@ -92,6 +92,14 @@ function Context:CreateEntity()
     return entity
 end
 
+
+function Context:GetEntity(uid)
+    if self.mEntityList[uid] then
+        return self.mEntityList[uid]
+    end
+    return nil
+end
+
 -----------------------------------------------------------------------------------------------------------------------
 -- Component 组件相关
 -----------------------------------------------------------------------------------------------------------------------
