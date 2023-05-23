@@ -44,6 +44,7 @@ function Group:Reset()
     self.mEntityIndexer = {}
 end
 
+---获取实体列表
 function Group:GetEntities()
     for key, value in pairs(self.mEntityIndexer) do
         print("group entity ", key)
@@ -54,12 +55,18 @@ end
 -- Group 私有方法
 -----------------------------------------------------------------------------------------------------------------------
 
+---添加组件
+---@param e entity
+---@param comp_id integer
 function Group:_OnAddComponent(e, comp_id)
     if self:_MatchEntity(e) then
         self.mEntityIndexer[e.mUID] = true
     end
 end
 
+---移除组件
+---@param e entity
+---@param comp_id integer
 function Group:_OnRemoveComponent(e, comp_id)
     if self.mRemoved == true then
         if self:_MatchEntity(e) then
@@ -70,6 +77,9 @@ function Group:_OnRemoveComponent(e, comp_id)
     end
 end
 
+---匹配匹配器
+---@param matcher Matcher
+---@return boolean
 function Group:_Match(matcher)
     if self.mAdded ~= matcher.mAdded or
         self.mRemoved ~= matcher.mRemoved or
@@ -93,6 +103,9 @@ function Group:_Match(matcher)
     return true
 end
 
+---匹配实体
+---@param e Entity
+---@return boolean
 function Group:_MatchEntity(e)
     for _, id in pairs(self.mAllOfContent) do
         if self.mAnyMode == true then

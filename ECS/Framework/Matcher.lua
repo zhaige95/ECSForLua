@@ -12,6 +12,10 @@ function Matcher:ctor()
     self:Reset()
 end
 
+function Matcher:OnDispose()
+
+end
+
 function Matcher:Reset()
     self.mAllOfContent = {}
     self.mNoneOfContent = {}

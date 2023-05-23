@@ -15,18 +15,29 @@ function Entity:ctor()
     self.mUID = 0
 end
 
+function Entity:OnDispose()
+
+end
+
+---添加组件事件
+---@param comp Component 组件实例
 function Entity:_OnAddComponent(comp)
     if not self.__component_indexer[comp.__id] then
         self.__component_indexer[comp.__id] = comp
     end
 end
 
+---移除组件事件
+---@param comp Component 组件实例
 function Entity:_OnRemoveComponent(comp)
     if self.__component_indexer[comp.__id] then
         self.__component_indexer[comp.__id] = nil
     end
 end
 
+---检查实体是否有指定id的组件
+---@param id integer
+---@return boolean
 function Entity:HasComponent(id)
     if self.__component_indexer[id] then
         return true

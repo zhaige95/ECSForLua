@@ -12,4 +12,8 @@ function Component:ctor()
     self.__id = 0
 end
 
+function Component:OnDispose()
+
+end
+
 return Component

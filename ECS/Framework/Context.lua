@@ -17,6 +17,7 @@ Context = {}
 -- Context API
 -----------------------------------------------------------------------------------------------------------------------
 
+---初始化
 function Context:Init()
     --- 实体对象回收池
     self.mEntityList_Recycle = {}
@@ -49,6 +50,9 @@ function Context:Init()
     self:_InitGroupData()
 end
 
+function Context:OnDispose()
+
+end
 
 -----------------------------------------------------------------------------------------------------------------------
 -- Context 私有方法
@@ -92,7 +96,9 @@ function Context:CreateEntity()
     return entity
 end
 
-
+---根据uid获取实体
+---@param uid integer
+---@return Entity entity对象
 function Context:GetEntity(uid)
     if self.mEntityList[uid] then
         return self.mEntityList[uid]
@@ -117,7 +123,9 @@ function Context:_GetComponent(component_id)
     return comp
 end
 
-
+---实体添加组件
+---@param e Entity 实体对象
+---@param component Component 组件对象
 function Context:_OnAddComponent(e, component)
     local id = component.__id
     for key, group in pairs(self.mGroupMap_Comp[id]) do
@@ -125,6 +133,9 @@ function Context:_OnAddComponent(e, component)
     end
 end
 
+---实体移除组件
+---@param e Entity 实体对象
+---@param component Component 组件对象
 function Context:_OnRemoveComponent(e, component)
     local id = component.__id
     for key, group in pairs(self.mGroupMap_Comp[id]) do
@@ -141,10 +152,15 @@ end
 -- Group 过滤组相关
 -----------------------------------------------------------------------------------------------------------------------
 
+---获取匹配器
+---@return Matcher 匹配器实例
 function Context:GetMatcher()
     return self.mMatcher:Reset()
 end
 
+---获取过滤组
+---@param matcher Matcher 匹配器
+---@return Group 过滤组实例
 function Context:GetGroup(matcher)
     local group = nil
     local id = Context:_GenerateGroupID(matcher)
@@ -178,6 +194,9 @@ function Context:GetGroup(matcher)
     return group
 end
 
+---生成过滤组id
+---@param group Group 过滤组实例
+---@return integer id
 function Context:_GenerateGroupID(group)
     local id = 0
     for index, value in ipairs(group.mAllOfContent) do
