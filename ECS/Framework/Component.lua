@@ -9,7 +9,7 @@
 local Component = class("Component")
 
 function Component:ctor()
-
+    self.__id = 0
 end
 
 return Component

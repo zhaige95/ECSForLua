@@ -6,10 +6,16 @@ require("ECS.Generated.GameContext")
 
 Context:Init()
 
-local e = Context:CreateEntity()
-e:AddTest("new  test", { 43, 5, 62, 523 })
+local group = Context:GetGroup(NewMatcher():AllOf(1))
 
-local group = Context:GetGroup(NewMatcher():AllOf(11, 1, 2, 45, 3):NoneOf(30, 6))
+local e = Context:CreateEntity()
+e:AddTest("new  test", { 523 })
+
+group:GetEntities()
+-- for key, value in pairs() do
+    
+-- end
+
 
 
 

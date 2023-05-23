@@ -111,9 +111,18 @@ print("----------- 生成GameEntity代码 --------------------------------------
 
 local entity_path = "ECS\\Generated\\GameEntity.lua"
 local code_entity = [[
+
 function GameEntity:Add[PName]([Param])
     self.[PName] = Context:_GetComponent(GameComponentLookUp.[Name])
     self.[PName]:Init([Param])
+    self:_OnAddComponent(self.[PName])
+    Context:_OnAddComponent(self, self.[PName])
+end
+
+function GameEntity:RemoveTest()
+    self:_OnRemoveComponent(self.[PName])
+    Context:_OnRemoveComponent(self, self.[PName])
+    self.[PName] = nil
 end
 
 ]]

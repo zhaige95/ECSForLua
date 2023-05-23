@@ -18,18 +18,23 @@ function Matcher:Reset()
 
     self.mAdded = false
     self.mRemoved = false
+    self.mAnyMode = false
     return self
 end
 
 function Matcher:AllOf(...)
-    self.mAllOfContent = {...}
-    -- table.sort(self.mAllOfContent)
+    self.mAllOfContent = { ... }
     return self
 end
 
 function Matcher:NoneOf(...)
-    self.mNoneOfContent = {...}
-    -- table.sort(self.mNoneOfContent)
+    self.mNoneOfContent = { ... }
+    return self
+end
+
+function Matcher:AnyOf(...)
+    self.mAllOfContent = { ... }
+    self.mAnyMode = true
     return self
 end
 
@@ -44,7 +49,6 @@ function Matcher:Removed()
 end
 
 function Matcher:AddedOrRemoved()
-    
     self.mAdded = true
     self.mRemoved = true
     return self
