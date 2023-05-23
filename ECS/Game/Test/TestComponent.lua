@@ -1,4 +1,6 @@
 local data = {
     id = "test",
-    list = {13, 18, 9595}
+    list = {}
 }
+
+return data

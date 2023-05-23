@@ -4,5 +4,8 @@
         "cast-local-type",
         "undefined-field"
     ],
-    "workbench.tree.indent": 24
+    "workbench.tree.indent": 24,
+    "Lua.diagnostics.globals": [
+        "_TABLE"
+    ]
 }

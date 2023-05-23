@@ -13,39 +13,40 @@ function Matcher:ctor()
 end
 
 function Matcher:Reset()
-    self.mAllOfIndexer = {}
-    self.mNoneOfIndexer = {}
+    self.mAllOfContent = {}
+    self.mNoneOfContent = {}
 
-    self.mOnAdded = false
-    self.mOnRemoved = false
+    self.mAdded = false
+    self.mRemoved = false
     return self
 end
 
 function Matcher:AllOf(...)
-    self.mAllOfIndexer = {...}
-    table.sort(self.mAllOfIndexer)
+    self.mAllOfContent = {...}
+    -- table.sort(self.mAllOfContent)
     return self
 end
 
 function Matcher:NoneOf(...)
-    self.mNoneOfIndexer = {...}
+    self.mNoneOfContent = {...}
+    -- table.sort(self.mNoneOfContent)
     return self
 end
 
 function Matcher:Added()
-    self.mOnAdded = true
+    self.mAdded = true
     return self
 end
 
 function Matcher:Removed()
-    self.mOnRemoved = true
+    self.mRemoved = true
     return self
 end
 
 function Matcher:AddedOrRemoved()
     
-    self.mOnAdded = true
-    self.mOnRemoved = true
+    self.mAdded = true
+    self.mRemoved = true
     return self
 end
 

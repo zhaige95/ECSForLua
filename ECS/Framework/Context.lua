@@ -6,20 +6,26 @@
 -----------------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------------
 
-local Entity = require("ECS.Entity")
-local Matcher = require("ECS.Matcher")
-local Group = require("ECS.Group")
+local Entity = require("ECS.Framework.Entity")
+local Matcher = require("ECS.Framework.Matcher")
+local Group = require("ECS.Framework.Group")
 
-Context = {
+Context = {}
+
+-----------------------------------------------------------------------------------------------------------------------
+-- Context API
+-----------------------------------------------------------------------------------------------------------------------
+
+function Context:Init()
     --- 实体对象回收池
-    mEntityList_Recycle = {},
+    self.mEntityList_Recycle = {}
     --- 组件对象回收池
-    mComponentList_Recycle = {},
+    self.mComponentList_Recycle = {}
 
     --- 实体列表
-    mEntityList = {},
+    self.mEntityList = {}
     --- 过滤组列表
-    mGroupList = {},
+    self.mGroupList = {}
     --[[
         mGroupList = {
             [onAdd:true] = {
@@ -30,27 +36,18 @@ Context = {
             }
         }
     ]]
-
     --- 实体UID，自增
-    mEntityUID = 0,
+    self.mEntityUID = 0
     --- 匹配器实例，只需要一个
-    mMatcher = Matcher.new()
-}
+    self.mMatcher = Matcher.new()
 
-
-
------------------------------------------------------------------------------------------------------------------------
--- Context API
------------------------------------------------------------------------------------------------------------------------
-
-
-function Context:Init()
+    self.mGroupList[true] = {}
+    self.mGroupList[false] = {}
     self.mGroupList[true][true] = {}
     self.mGroupList[true][false] = {}
     self.mGroupList[false][false] = {}
     self.mGroupList[false][true] = {}
 end
-
 
 ---获取实体uid
 ---@return integer UID
@@ -82,14 +79,14 @@ end
 -----------------------------------------------------------------------------------------------------------------------
 
 ---获取组件实例，优先取回收的组件，不够时创建新的
----@param comp_name 组件名
+---@param component_id integer 组件id
 ---@return Component 组件实例
-function Context:GetComponent(comp_name)
-    if self.mComponentList_Recycle[comp_name] and
-        #self.mComponentList_Recycle[comp_name] > 0 then
-        return table.remove(self.mComponentList_Recycle[comp_name], 1)
+function Context:_GetComponent(component_id)
+    if self.mComponentList_Recycle[component_id] and
+        #self.mComponentList_Recycle[component_id] > 0 then
+        return table.remove(self.mComponentList_Recycle[component_id], 1)
     end
-    return self.mComps["TestComponent"].new()
+    return GameComponentScript[component_id].new()
 end
 
 -----------------------------------------------------------------------------------------------------------------------
@@ -101,17 +98,45 @@ end
 -- Group 过滤组相关
 -----------------------------------------------------------------------------------------------------------------------
 
-function Context:Matcher()
+function Context:GetMatcher()
     return self.mMatcher:Reset()
 end
 
 function Context:GetGroup(matcher)
     local group = nil
-    
+    local id = Context:_GenerateGroupID(matcher)
+
+    if self.mGroupList[matcher.mAdded][matcher.mRemoved] then
+        local _set = self.mGroupList[matcher.mAdded][matcher.mRemoved][id]
+        if _set then
+            for _, value in pairs(_set) do
+                if value:Match(matcher) then
+                    group = value
+                    break
+                end
+            end
+        end
+    end
+
     if nil == group then
-       group = Group.new(matcher)
-       table.insert(self.mGroupList[group.mOnAdded][group.mOnRemoved], group)
+        group = Group.new(id, matcher)
+        if nil == self.mGroupList[group.mAdded][group.mRemoved][id] then
+            self.mGroupList[group.mAdded][group.mRemoved][id] = {}
+        end
+        table.insert(self.mGroupList[group.mAdded][group.mRemoved][id], group)
     end
 
     return group
+end
+
+function Context:_GenerateGroupID(group)
+    local id = 0
+    for index, value in ipairs(group.mAllOfContent) do
+        id = id + value
+    end
+    for index, value in ipairs(group.mNoneOfContent) do
+        id = id + value
+    end
+    print("id = ", id)
+    return id
 end
