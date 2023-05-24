@@ -46,17 +46,12 @@ for name, path in pairs(process) do
 
     entity_extention[name] = {}
 
-    ---------------- 处理参数 ----------------
-    local param = ''
-    for key, value in pairs(script) do
-        param = string.format('%s, %s', param, key)
-    end
-    param = string.sub(param, 3, #param)
-
     ---------------- 处理属性字段 ----------------
     local content = ''
     local index = 0
     local line = ''
+    local param = ''
+    
     for r in file:lines() do
         index = index + 1
         if index >= 2 then
@@ -70,21 +65,32 @@ for name, path in pairs(process) do
                 line = line:sub(1, #line - 1)
             end
             -- 分割行，1 = 属性名，2 = 属性默认值
-            local sp = split(line, '=')
+            local sp_pos = line:find('=')
+            local prop_name = line
+            local prop_value = ''
+            if sp_pos then
+                prop_name = line:sub(1, sp_pos - 1)
+                prop_value = line:sub(sp_pos + 1)
+            end
+            
 
-
-            if #sp == 1 then
-                content = string.format("%s        self.%s = %s\n", content, sp[1], sp[1])
-            elseif #sp == 2 then
+            if nil == sp_pos then
+                content = string.format("%s        self.%s = %s\n", content, prop_name, prop_name)
+            else
                 -- 需要处理布尔值，不能直接用or，否则不能正确赋值
-                if type(script[sp[1]]) == 'boolean' then
-                    content = string.format("%s        self.%s = %s == nil and false or %s\n", content, sp[1], sp[1], sp[2])
+                if type(script[prop_name]) == 'boolean' then
+                    content = string.format("%s        self.%s = %s == nil and false or %s\n", content, prop_name, prop_name,
+                        prop_value)
                 else
-                    content = string.format("%s        self.%s = %s or %s\n", content, sp[1], sp[1], sp[2])
+                    content = string.format("%s        self.%s = %s or %s\n", content, prop_name, prop_name, prop_value)
                 end
             end
+
+            ---------------- 处理参数 ----------------
+            param = string.format('%s, %s', param, prop_name)
         end
     end
+    param = string.sub(param, 3, #param)
 
     file:close()
 
@@ -100,7 +106,7 @@ for name, path in pairs(process) do
     file:write(code)
     file:close()
 
-    
+
     print('----------------------')
 end
 
@@ -171,18 +177,44 @@ return GameEntity
 print(code_head)
 
 local entity_file = io.open(entity_path, "w+")
+assert(entity_file, "entity_file file is nil")
 entity_file:write(code_head)
 entity_file:close()
 
 
+---------------------------------------------------------------------------------------
+-- 生成GameContext代码
+---------------------------------------------------------------------------------------
+print("----------- 生成GameContext代码 -----------------------------------------------")
 
+local path_context = "ECS\\Generated\\GameContext.lua"
+local code_context = [[
+GameComponentScript = {
+[REQ]
+}
 
+GameComponentLookUp = {
+[LOK]
+}
+]]
 
+local req = ''
+local lok = ''
+local index = 1
+for key, value in pairs(entity_extention) do
+    req = req .. string.format("    [%d] = require('ECS.Generated.Components.Game%s'),\n", index, key)
+    lok = lok .. string.format("    %s = %d,\n", key, index)
+    index = index + 1
+end
+code_context = code_context:gsub('%[REQ]', req)
+code_context = code_context:gsub('%[LOK]', lok)
 
+print(code_context)
 
+local context_file = io.open(path_context, "w+")
+assert(context_file, "context_file file is nil")
+context_file:write(code_context)
+context_file:close()
 
 
 print("----------- 代码生成完毕 ------------------------------------------------------")
-
-
-

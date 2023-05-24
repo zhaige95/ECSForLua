@@ -2,7 +2,11 @@
     "Lua.diagnostics.disable": [
         "lowercase-global",
         "cast-local-type",
-        "undefined-field"
+        "undefined-field",
+        "undefined-doc-name",
+        "need-check-nil",
+        "return-type-mismatch",
+        "param-type-mismatch"
     ],
     "workbench.tree.indent": 24,
     "Lua.diagnostics.globals": [

@@ -1,9 +1,11 @@
 GameComponentScript = {
-    [1] = require("ECS.Generated.Components.GameTestComponent"),
-    [2] = require("ECS.Generated.Components.GameMoveComponent"),
+    [1] = require('ECS.Generated.Components.GameMoveComponent'),
+    [2] = require('ECS.Generated.Components.GameTestComponent'),
+
 }
 
 GameComponentLookUp = {
-    TestComponent = 1,
-    MoveComponent = 2,
+    MoveComponent = 1,
+    TestComponent = 2,
+
 }

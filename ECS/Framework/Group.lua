@@ -86,7 +86,7 @@ function Group:_OnDestroyEntity(e)
 end
 
 ---添加组件
----@param e entity
+---@param e Entity
 ---@param comp_id integer
 function Group:_OnAddComponent(e, comp_id)
     if self:_MatchEntity(e) then
@@ -96,7 +96,7 @@ function Group:_OnAddComponent(e, comp_id)
 end
 
 ---移除组件
----@param e entity
+---@param e Entity
 ---@param comp_id integer
 function Group:_OnRemoveComponent(e, comp_id)
     if self.mRemoved == true then

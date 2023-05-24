@@ -16,4 +16,8 @@ function System:OnDispose()
 
 end
 
+function System:Execute(dt)
+
+end
+
 return System

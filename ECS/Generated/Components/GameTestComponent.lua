@@ -3,7 +3,7 @@
 
     function TestComponent:Init(id, list)
         self.id = id or "test"
-        self.list = list or {}
+        self.list = list
 
     end
 
