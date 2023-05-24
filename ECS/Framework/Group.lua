@@ -11,6 +11,7 @@ local Group = class("Group")
 function Group:ctor(id, matcher)
     self:Reset()
 
+    self.mIsDirty = true
     self.mAdded = matcher.mAdded
     self.mRemoved = matcher.mRemoved
     self.mAnyMode = matcher.mAnyMode
@@ -24,6 +25,15 @@ function Group:ctor(id, matcher)
         table.insert(self.mNoneOfContent, value)
     end
     self.mID = id
+    --- 实体对象缓存
+    self.__entities = {}
+    --[[
+        self.__entities = {
+            [uid] = entity,
+            [uid] = entity,
+            ...
+        }
+    ]]
 end
 
 function Group:OnDispose()
@@ -42,18 +52,38 @@ function Group:Reset()
     self.mAnyMode = false
 
     self.mEntityIndexer = {}
+    --- 实体对象缓存
+    self.__entities = {}
 end
 
 ---获取实体列表
 function Group:GetEntities()
-    for key, value in pairs(self.mEntityIndexer) do
-        print("group entity ", key)
+    if self.mIsDirty == true then
+        for key, value in pairs(self.mEntityIndexer) do
+            if nil == self.__entities[key] then
+                self.__entities[key] = Context:GetEntity(key)
+            end
+        end
+
+        self.mIsDirty = false
     end
+
+    return self.__entities
 end
 
 -----------------------------------------------------------------------------------------------------------------------
 -- Group 私有方法
 -----------------------------------------------------------------------------------------------------------------------
+
+function Group:_OnDestroyEntity(e)
+    if self.mEntityIndexer[e.mUID] then
+        self.mEntityIndexer[e.mUID] = nil
+    end
+    if self.__entities[e.mUID] then
+        self.__entities[e.mUID] = nil
+    end
+    self.mIsDirty = true
+end
 
 ---添加组件
 ---@param e entity
@@ -61,6 +91,7 @@ end
 function Group:_OnAddComponent(e, comp_id)
     if self:_MatchEntity(e) then
         self.mEntityIndexer[e.mUID] = true
+        self.mIsDirty = true
     end
 end
 
@@ -71,6 +102,7 @@ function Group:_OnRemoveComponent(e, comp_id)
     if self.mRemoved == true then
         if self:_MatchEntity(e) then
             self.mEntityIndexer[e.mUID] = true
+            self.mIsDirty = true
         end
     else
         self.mEntityIndexer[e.mUID] = nil

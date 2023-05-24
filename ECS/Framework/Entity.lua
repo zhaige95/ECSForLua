@@ -19,6 +19,11 @@ function Entity:OnDispose()
 
 end
 
+---销毁实体
+function Entity:Destroy()
+    Context:_OnDestroyEntity(self)
+end
+
 ---添加组件事件
 ---@param comp Component 组件实例
 function Entity:_OnAddComponent(comp)

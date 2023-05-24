@@ -11,16 +11,26 @@ local group = Context:GetGroup(NewMatcher():AllOf(1))
 local e = Context:CreateEntity()
 e:AddTest("new  test", { 523 })
 
-group:GetEntities()
--- for key, value in pairs() do
-    
--- end
+print("-------------------")
+for key, value in pairs(group:GetEntities()) do
+    print("group1", key)
+end
 
+local move = Context:CreateEntity()
+move:AddMove(10)
+move:AddTest("move  test", { 1995 })
 
+print("-------------------")
+for key, value in pairs(group:GetEntities()) do
+    print("group2", key)
+end
 
+move:Destroy()
 
-
-
+print("-------------------")
+for key, value in pairs(group:GetEntities()) do
+    print("group3", key)
+end
 
 
 

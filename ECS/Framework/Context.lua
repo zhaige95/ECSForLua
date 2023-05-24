@@ -27,7 +27,13 @@ function Context:Init()
     self.mEntityList = {}
     --- 过滤组列表
     self.mGroupMap_Comp = {} -- 由组件id索引
-    self.mGroupMap_Key = {}  -- 由Added、Removed动作和数字id索引
+    --[[
+        mGroupMap_Comp = {
+            [1] = {...},
+            [10] = {...}
+        }
+    ]]
+    self.mGroupMap_Key = {} -- 由Added、Removed动作和数字id索引
     --[[
         mGroupMap_Key = {
             [onAdd:true] = {
@@ -104,6 +110,31 @@ function Context:GetEntity(uid)
         return self.mEntityList[uid]
     end
     return nil
+end
+
+function Context:_OnDestroyEntity(e)
+    if nil == e then
+        return
+    end
+    for comp_id, comp in pairs(e.__component_indexer) do
+        -- 先处理group
+        for key, group in pairs(self.mGroupMap_Comp[comp_id]) do
+            group:_OnDestroyEntity(e)
+        end
+        -- 回收entity组件
+        if nil == self.mComponentList_Recycle[comp_id] then
+            self.mComponentList_Recycle[comp_id] = {}
+        end
+        table.insert(self.mComponentList_Recycle[comp_id], comp)
+        e:_OnRemoveComponent(comp)
+    end
+    -- 清理组件数据
+    e:ClearComponents()
+    -- 回收entity
+    table.insert(self.mEntityList_Recycle, e)
+    if self.mEntityList[e.mUID] then
+        self.mEntityList[e.mUID] = nil
+    end
 end
 
 -----------------------------------------------------------------------------------------------------------------------
@@ -205,6 +236,6 @@ function Context:_GenerateGroupID(group)
     for index, value in ipairs(group.mNoneOfContent) do
         id = id + value
     end
-    
+
     return id
 end

@@ -1,6 +1,5 @@
 --============================================================================================
 -- ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓
-require("lfs")
 
 local process = {
     TestComponent = "ECS\\Game\\Test\\TestComponent.lua",
@@ -113,10 +112,25 @@ end
 print("----------- 生成GameEntity代码 -----------------------------------------------")
 
 local entity_path = "ECS\\Generated\\GameEntity.lua"
-local code_entity = [[
+
+local code_head = [[
+local GameEntity = class("GameEntity")
+
+function GameEntity:ClearComponents()
+[ClearCode]
+end
+
+]]
+
+
+local code_body = [[
 
 --========= [Name] ========================================================================
 function GameEntity:Add[PName]([Param])
+    if self:HasComponent(GameComponentLookUp.[Name]) == true then
+        -- TODO 已存在组件触发replace
+        return
+    end
     self.[PName] = Context:_GetComponent(GameComponentLookUp.[Name])
     self.[PName]:Init([Param])
     self:_OnAddComponent(self.[PName])
@@ -124,6 +138,7 @@ function GameEntity:Add[PName]([Param])
 end
 
 function GameEntity:Remove[PName]()
+    if self:HasComponent(GameComponentLookUp.[Name]) == false then return end
     self:_OnRemoveComponent(self.[PName])
     Context:_OnRemoveComponent(self, self.[PName])
     self.[PName] = nil
@@ -134,29 +149,29 @@ function GameEntity:Has[PName]()
 end
 ]]
 
-local builder_entity = [[
-local GameEntity = class("GameEntity")
-
-]]
+local clear_builder = ''
 
 for key, value in pairs(entity_extention) do
     local propery_name = key:gsub("Component", '')
-    local code = code_entity
+    local code = code_body
     code = code:gsub('%[Param]', value)
     code = code:gsub('%[PName]', propery_name)
     code = code:gsub('%[Name]', key)
-    builder_entity = builder_entity .. code
+    code_head = code_head .. code
+
+    clear_builder = clear_builder .. string.format("    self.%s = nil\n", propery_name)
 end
 
-builder_entity = builder_entity .. [[
+code_head = code_head:gsub('%[ClearCode]', clear_builder)
+code_head = code_head .. [[
 
 return GameEntity
 ]]
 
-print(builder_entity)
+print(code_head)
 
 local entity_file = io.open(entity_path, "w+")
-entity_file:write(builder_entity)
+entity_file:write(code_head)
 entity_file:close()
 
 
