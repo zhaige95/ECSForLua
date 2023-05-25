@@ -4,7 +4,7 @@
 local process = {
     TestComponent = "ECS\\Game\\Test\\TestComponent.lua",
     MoveComponent = "ECS\\Game\\Move\\MoveComponent.lua",
-
+    Camp1Component = "ECS\\Game\\Camp1Component.lua"
 }
 
 
@@ -14,7 +14,19 @@ local process = {
 require("Core.functions")
 local generate_path = 'ECS\\Generated\\Components\\Game'
 
-local code_template = [[
+local entity_extention = {}
+--[[
+    entity_extention = {
+        [TestComponent] = 'id, list, bol'
+    }
+]]
+---------------------------------------------------------------------------------------
+-- 生成GameComponent代码
+---------------------------------------------------------------------------------------
+print("----------- 生成GameComponent代码 -----------------------------------------------")
+
+for name, path in pairs(process) do
+    local code_comp = [[
 local _Base = require('ECS.Framework.Component')
 local [Name] = class('[Name]', _Base)
 
@@ -29,18 +41,6 @@ end
 return [Name]
 ]]
 
-local entity_extention = {}
---[[
-    entity_extention = {
-        [TestComponent] = 'id, list, bol'
-    }
-]]
----------------------------------------------------------------------------------------
--- 生成GameComponent代码
----------------------------------------------------------------------------------------
-print("----------- 生成GameComponent代码 -----------------------------------------------")
-
-for name, path in pairs(process) do
     local comp = path:gsub('\\', '.')
     comp = comp:gsub('.lua', '')
     local script = require(comp)
@@ -66,6 +66,9 @@ for name, path in pairs(process) do
             line = r
             line = line:gsub(' ', '')
             line = line:gsub('\n', '')
+            if line == '' then
+                goto continue
+            end
             if line:sub(#line) == ',' then
                 line = line:sub(1, #line - 1)
             end
@@ -106,15 +109,16 @@ for name, path in pairs(process) do
             ---------------- 处理参数 ----------------
             param = string.format('%s, %s', param, prop_name)
         end
+        ::continue::
     end
     param = string.sub(param, 3, #param)
 
     file:close()
 
-    code_template = code_template:gsub('%[Name]', name)
-    code_template = code_template:gsub('%[Param]', param)
-    code_template = code_template:gsub('%[Prop]', content)
-    code_template = code_template:gsub('%[SetData]', set_content)
+    code_comp = code_comp:gsub('%[Name]', name)
+    code_comp = code_comp:gsub('%[Param]', param)
+    code_comp = code_comp:gsub('%[Prop]', content)
+    code_comp = code_comp:gsub('%[SetData]', set_content)
 
 
     -- 缓存到GameEntity扩展列表
@@ -123,7 +127,7 @@ for name, path in pairs(process) do
     file = io.open(generate_path .. name .. '.lua', 'w+')
 
     assert(file, "create file is nil")
-    file:write(code_template)
+    file:write(code_comp)
     file:close()
 
 
@@ -164,7 +168,7 @@ function GameEntity:Add[PName]([Param])
 end
 
 function GameEntity:Update[PName]([Param])
-    if self:HasComponent(GameComponentLookUp.TestComponent) == false then
+    if self:HasComponent(GameComponentLookUp.[Name]) == false then
         self:Add[PName]([Param])
         return
     end

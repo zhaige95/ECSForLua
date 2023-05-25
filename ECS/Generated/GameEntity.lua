@@ -1,11 +1,44 @@
 local GameEntity = class("GameEntity")
 
 function GameEntity:ClearComponents()
-    self.Test = nil
     self.Move = nil
+    self.Test = nil
+    self.Camp1 = nil
 
 end
 
+
+--========= MoveComponent ========================================================================
+function GameEntity:AddMove(speed, direction, isMoving)
+    if self:HasComponent(GameComponentLookUp.MoveComponent) == true then
+        self:UpdateMove(speed, direction, isMoving)
+        return
+    end
+    self.Move = Context:_GetComponent(GameComponentLookUp.MoveComponent)
+    self.Move:Init(speed, direction, isMoving)
+    self:_OnAddComponent(self.Move)
+    Context:_OnAddComponent(self, self.Move)
+end
+
+function GameEntity:UpdateMove(speed, direction, isMoving)
+    if self:HasComponent(GameComponentLookUp.MoveComponent) == false then
+        self:AddMove(speed, direction, isMoving)
+        return
+    end
+    self.Move:SetData(speed, direction, isMoving)
+    Context:_OnUpdateComponent(self, self.Move)
+end
+
+function GameEntity:RemoveMove()
+    if self:HasComponent(GameComponentLookUp.MoveComponent) == false then return end
+    Context:_OnRemoveComponent(self, self.Move)
+    self:_OnRemoveComponent(self.Move)
+    self.Move = nil
+end
+
+function GameEntity:HasMove()
+    return self:HasComponent(GameComponentLookUp.MoveComponent)
+end
 
 --========= TestComponent ========================================================================
 function GameEntity:AddTest(id, list)
@@ -39,36 +72,36 @@ function GameEntity:HasTest()
     return self:HasComponent(GameComponentLookUp.TestComponent)
 end
 
---========= MoveComponent ========================================================================
-function GameEntity:AddMove(speed, direction, isMoving)
-    if self:HasComponent(GameComponentLookUp.MoveComponent) == true then
-        self:UpdateMove(speed, direction, isMoving)
+--========= Camp1Component ========================================================================
+function GameEntity:AddCamp1()
+    if self:HasComponent(GameComponentLookUp.Camp1Component) == true then
+        self:UpdateCamp1()
         return
     end
-    self.Move = Context:_GetComponent(GameComponentLookUp.MoveComponent)
-    self.Move:Init(speed, direction, isMoving)
-    self:_OnAddComponent(self.Move)
-    Context:_OnAddComponent(self, self.Move)
+    self.Camp1 = Context:_GetComponent(GameComponentLookUp.Camp1Component)
+    self.Camp1:Init()
+    self:_OnAddComponent(self.Camp1)
+    Context:_OnAddComponent(self, self.Camp1)
 end
 
-function GameEntity:UpdateMove(speed, direction, isMoving)
-    if self:HasComponent(GameComponentLookUp.TestComponent) == false then
-        self:AddMove(speed, direction, isMoving)
+function GameEntity:UpdateCamp1()
+    if self:HasComponent(GameComponentLookUp.Camp1Component) == false then
+        self:AddCamp1()
         return
     end
-    self.Move:SetData(speed, direction, isMoving)
-    Context:_OnUpdateComponent(self, self.Move)
+    self.Camp1:SetData()
+    Context:_OnUpdateComponent(self, self.Camp1)
 end
 
-function GameEntity:RemoveMove()
-    if self:HasComponent(GameComponentLookUp.MoveComponent) == false then return end
-    Context:_OnRemoveComponent(self, self.Move)
-    self:_OnRemoveComponent(self.Move)
-    self.Move = nil
+function GameEntity:RemoveCamp1()
+    if self:HasComponent(GameComponentLookUp.Camp1Component) == false then return end
+    Context:_OnRemoveComponent(self, self.Camp1)
+    self:_OnRemoveComponent(self.Camp1)
+    self.Camp1 = nil
 end
 
-function GameEntity:HasMove()
-    return self:HasComponent(GameComponentLookUp.MoveComponent)
+function GameEntity:HasCamp1()
+    return self:HasComponent(GameComponentLookUp.Camp1Component)
 end
 
 return GameEntity
