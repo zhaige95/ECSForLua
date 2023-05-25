@@ -6,7 +6,7 @@ require("ECS.Generated.GameContext")
 
 Context:Init()
 
-local group = Context:GetGroup(NewMatcher():AllOf(EMatcher.Test):NoneOf(EMatcher.Move))
+local group = Context:GetGroup(NewMatcher():AllOf(EMatcher.Test):Added())
 local group2 = Context:GetGroup(NewMatcher():AllOf(1, 2))
 
 local e = Context:CreateEntity()
@@ -32,7 +32,10 @@ for key, value in pairs(group2:GetEntities()) do
     print("group2  b", key)
 end
 
-e:Destroy()
+-- e:Destroy()
+
+
+Context:Clear()
 
 print("-------------------")
 for key, value in pairs(group:GetEntities()) do
@@ -41,8 +44,6 @@ end
 for key, value in pairs(group2:GetEntities()) do
     print("group2  c", key)
 end
-
-
 
 
 

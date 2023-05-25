@@ -58,6 +58,16 @@ function Group:Reset()
     self.__entities = {}
 end
 
+function Group:ClearEntity()
+    for key, value in pairs(self.mEntityIndexer) do
+        self.mEntityIndexer[key] = nil
+        if self.__entities[key] then
+            self.__entities[key] = nil
+        end
+    end
+    self.mIsDirty = true
+end
+
 ---获取实体列表
 function Group:GetEntities()
     if self.mIsDirty == true then
@@ -129,7 +139,7 @@ end
 function Group:_Match(matcher)
     if self.mAdded ~= matcher.mAdded or
         self.mRemoved ~= matcher.mRemoved or
-        self.mAnyMode ~= matcher.mAnyMode or 
+        self.mAnyMode ~= matcher.mAnyMode or
         self.mUpdated ~= matcher.mUpdated
     then
         return false

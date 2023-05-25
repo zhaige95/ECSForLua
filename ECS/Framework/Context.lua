@@ -26,10 +26,7 @@ function Context:Init()
     --- 实体列表
     self.mEntityList = {}
     --- 过滤组列表
-    self.mGroupList = {}    -- 由group id索引
-    --[[
-
-    ]]
+    self.mGroupList = {}     -- 由group id索引
     self.mGroupMap_Comp = {} -- 由组件id索引，有重复
     --[[
         mGroupMap_Comp = {
@@ -59,6 +56,19 @@ function Context:OnDispose()
 
 end
 
+function Context:Clear()
+    for _, set in pairs(self.mGroupList) do
+        for _, group in pairs(set) do
+            if group.mAdded == true or
+                group.mRemoved == true or
+                group.mUpdated == true
+            then
+                group:ClearEntity()
+            end
+        end
+    end
+end
+
 -----------------------------------------------------------------------------------------------------------------------
 -- Context 私有方法
 -----------------------------------------------------------------------------------------------------------------------
@@ -79,7 +89,6 @@ function Context:_InitGroupData()
     -- self.mGroupMap_Act.Added = {}
     -- self.mGroupMap_Act.Removed = {}
     -- self.mGroupMap_Act.Updated = {}
-
 end
 
 -----------------------------------------------------------------------------------------------------------------------
@@ -172,7 +181,6 @@ function Context:_OnRemoveComponent(e, component)
     end
 end
 
-
 function Context:_OnUpdateComponent(e, component)
     local id = component.__id
     for key, group in pairs(self.mGroupMap_Comp[id]) do
@@ -199,7 +207,7 @@ end
 ---@param matcher Matcher 匹配器
 ---@return Group 过滤组实例
 function Context:GetGroup(matcher)
-    if nil == matcher then return nil end 
+    if nil == matcher then return nil end
     local group = nil
     local id = Context:_GenerateGroupID(matcher)
 
