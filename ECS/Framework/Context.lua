@@ -269,7 +269,7 @@ function Context:GetGroup(matcher)
     return group
 end
 
----生成过滤组id
+---生成过滤组id，组件id简单求和做id有大概0.3%的碰撞概率，所以不是唯一id，但是可以大幅减少无用的遍历
 ---@param matcher Matcher 匹配器实例
 ---@return integer id
 function Context:_GenerateGroupID(matcher)
