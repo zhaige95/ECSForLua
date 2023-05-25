@@ -6,7 +6,7 @@ require("ECS.Generated.GameContext")
 
 Context:Init()
 
-local group = Context:GetGroup(NewMatcher():AllOf(1):NoneOf(2))
+local group = Context:GetGroup(NewMatcher():AllOf(EMatcher.Test):NoneOf(EMatcher.Move))
 local group2 = Context:GetGroup(NewMatcher():AllOf(1, 2))
 
 local e = Context:CreateEntity()
