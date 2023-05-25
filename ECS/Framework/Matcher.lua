@@ -45,6 +45,7 @@ end
 
 function Matcher:Added()
     self.mAdded = true
+    self.mUpdated = false
     return self
 end
 
@@ -53,8 +54,9 @@ function Matcher:Removed()
     return self
 end
 
-function Matcher:Update()
+function Matcher:Updated()
     self.mUpdated = true
+    self.mAdded = false
     return self
 end
 

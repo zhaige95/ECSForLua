@@ -6,44 +6,37 @@ require("ECS.Generated.GameContext")
 
 Context:Init()
 
-local group = Context:GetGroup(NewMatcher():AllOf(EMatcher.Test):Added())
+local group = Context:GetGroup(NewMatcher():AllOf(EMatcher.Test):Updated():Removed())
 local group2 = Context:GetGroup(NewMatcher():AllOf(1, 2))
 
 local e = Context:CreateEntity()
 e:AddTest("new  test", { 523 })
 
 print("-------------------")
-for key, value in pairs(group:GetEntities()) do
-    print("group1  a", key)
-end
-for key, value in pairs(group2:GetEntities()) do
-    print("group2  a", key)
-end
+group:Test_GetEntities()
+group2:Test_GetEntities()
+
+
+--- Loop 1 ------------------------------------------------------------------------
+Context:Clear()
 
 local move = Context:CreateEntity()
 move:AddMove(10)
 move:AddTest("move  test", { 1995 })
 
 print("-------------------")
-for key, value in pairs(group:GetEntities()) do
-    print("group1  b", key)
-end
-for key, value in pairs(group2:GetEntities()) do
-    print("group2  b", key)
-end
-
--- e:Destroy()
+group:Test_GetEntities()
+group2:Test_GetEntities()
 
 
+--- Loop 2 ------------------------------------------------------------------------
 Context:Clear()
 
+e:RemoveTest()
+
 print("-------------------")
-for key, value in pairs(group:GetEntities()) do
-    print("group1  c", key)
-end
-for key, value in pairs(group2:GetEntities()) do
-    print("group2  c", key)
-end
+group:Test_GetEntities()
+group2:Test_GetEntities()
 
 
 

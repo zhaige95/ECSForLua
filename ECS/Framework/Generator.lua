@@ -15,14 +15,18 @@ require("Core.functions")
 local generate_path = 'ECS\\Generated\\Components\\Game'
 
 local code_template = [[
-    local _Base = require('ECS.Framework.Component')
-    local %s = class('%s', _Base)
+local _Base = require('ECS.Framework.Component')
+local [Name] = class('[Name]', _Base)
 
-    function %s:Init(%s)
-%s
-    end
+function [Name]:Init([Param])
+[Prop]
+end
 
-    return %s
+function [Name]:SetData([Param])
+[SetData]
+end
+
+return [Name]
 ]]
 
 local entity_extention = {}
@@ -48,10 +52,11 @@ for name, path in pairs(process) do
 
     ---------------- 处理属性字段 ----------------
     local content = ''
+    local set_content = ''
     local index = 0
     local line = ''
     local param = ''
-    
+
     for r in file:lines() do
         index = index + 1
         if index >= 2 then
@@ -72,18 +77,30 @@ for name, path in pairs(process) do
                 prop_name = line:sub(1, sp_pos - 1)
                 prop_value = line:sub(sp_pos + 1)
             end
-            
+
 
             if nil == sp_pos then
                 content = string.format("%s        self.%s = %s\n", content, prop_name, prop_name)
             else
                 -- 需要处理布尔值，不能直接用or，否则不能正确赋值
                 if type(script[prop_name]) == 'boolean' then
-                    content = string.format("%s        self.%s = %s == nil and false or %s\n", content, prop_name, prop_name,
+                    content = string.format("%s        self.%s = %s == nil and false or %s\n", content, prop_name,
+                        prop_name,
                         prop_value)
                 else
                     content = string.format("%s        self.%s = %s or %s\n", content, prop_name, prop_name, prop_value)
                 end
+            end
+
+
+            -- 需要处理布尔值，不能直接用or，否则不能正确赋值
+            if type(script[prop_name]) == 'boolean' then
+                set_content = string.format("%s        self.%s = %s == nil and self.%s or %s\n", set_content, prop_name,
+                    prop_name,
+                    prop_name, prop_name)
+            else
+                set_content = string.format("%s        self.%s = %s or self.%s\n", set_content, prop_name, prop_name,
+                    prop_name)
             end
 
             ---------------- 处理参数 ----------------
@@ -94,8 +111,11 @@ for name, path in pairs(process) do
 
     file:close()
 
-    local code = string.format(code_template, name, name, name, param, content, name)
-    print(code)
+    code_template = code_template:gsub('%[Name]', name)
+    code_template = code_template:gsub('%[Param]', param)
+    code_template = code_template:gsub('%[Prop]', content)
+    code_template = code_template:gsub('%[SetData]', set_content)
+
 
     -- 缓存到GameEntity扩展列表
     entity_extention[name] = param
@@ -103,7 +123,7 @@ for name, path in pairs(process) do
     file = io.open(generate_path .. name .. '.lua', 'w+')
 
     assert(file, "create file is nil")
-    file:write(code)
+    file:write(code_template)
     file:close()
 
 
@@ -134,7 +154,7 @@ local code_body = [[
 --========= [Name] ========================================================================
 function GameEntity:Add[PName]([Param])
     if self:HasComponent(GameComponentLookUp.[Name]) == true then
-        -- TODO 已存在组件触发replace
+        self:Update[PName]([Param])
         return
     end
     self.[PName] = Context:_GetComponent(GameComponentLookUp.[Name])
@@ -143,10 +163,19 @@ function GameEntity:Add[PName]([Param])
     Context:_OnAddComponent(self, self.[PName])
 end
 
+function GameEntity:Update[PName]([Param])
+    if self:HasComponent(GameComponentLookUp.TestComponent) == false then
+        self:Add[PName]([Param])
+        return
+    end
+    self.[PName]:SetData([Param])
+    Context:_OnUpdateComponent(self, self.[PName])
+end
+
 function GameEntity:Remove[PName]()
     if self:HasComponent(GameComponentLookUp.[Name]) == false then return end
-    self:_OnRemoveComponent(self.[PName])
     Context:_OnRemoveComponent(self, self.[PName])
+    self:_OnRemoveComponent(self.[PName])
     self.[PName] = nil
 end
 

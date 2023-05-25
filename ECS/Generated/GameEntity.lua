@@ -10,7 +10,7 @@ end
 --========= TestComponent ========================================================================
 function GameEntity:AddTest(id, list)
     if self:HasComponent(GameComponentLookUp.TestComponent) == true then
-        -- TODO 已存在组件触发replace
+        self:UpdateTest(id, list)
         return
     end
     self.Test = Context:_GetComponent(GameComponentLookUp.TestComponent)
@@ -19,10 +19,19 @@ function GameEntity:AddTest(id, list)
     Context:_OnAddComponent(self, self.Test)
 end
 
+function GameEntity:UpdateTest(id, list)
+    if self:HasComponent(GameComponentLookUp.TestComponent) == false then
+        self:AddTest(id, list)
+        return
+    end
+    self.Test:SetData(id, list)
+    Context:_OnUpdateComponent(self, self.Test)
+end
+
 function GameEntity:RemoveTest()
     if self:HasComponent(GameComponentLookUp.TestComponent) == false then return end
-    self:_OnRemoveComponent(self.Test)
     Context:_OnRemoveComponent(self, self.Test)
+    self:_OnRemoveComponent(self.Test)
     self.Test = nil
 end
 
@@ -33,7 +42,7 @@ end
 --========= MoveComponent ========================================================================
 function GameEntity:AddMove(speed, direction, isMoving)
     if self:HasComponent(GameComponentLookUp.MoveComponent) == true then
-        -- TODO 已存在组件触发replace
+        self:UpdateMove(speed, direction, isMoving)
         return
     end
     self.Move = Context:_GetComponent(GameComponentLookUp.MoveComponent)
@@ -42,10 +51,19 @@ function GameEntity:AddMove(speed, direction, isMoving)
     Context:_OnAddComponent(self, self.Move)
 end
 
+function GameEntity:UpdateMove(speed, direction, isMoving)
+    if self:HasComponent(GameComponentLookUp.TestComponent) == false then
+        self:AddMove(speed, direction, isMoving)
+        return
+    end
+    self.Move:SetData(speed, direction, isMoving)
+    Context:_OnUpdateComponent(self, self.Move)
+end
+
 function GameEntity:RemoveMove()
     if self:HasComponent(GameComponentLookUp.MoveComponent) == false then return end
-    self:_OnRemoveComponent(self.Move)
     Context:_OnRemoveComponent(self, self.Move)
+    self:_OnRemoveComponent(self.Move)
     self.Move = nil
 end
 

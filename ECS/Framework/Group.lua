@@ -35,6 +35,8 @@ function Group:ctor(id, matcher)
             ...
         }
     ]]
+    self.__test_id = string.format("%d:%s:%s:%s —> ", self.mID, self.mAdded and 'add' or '_', self.mRemoved and 'removed' or '_',
+        self.mUpdated and 'updated' or '_')
 end
 
 function Group:OnDispose()
@@ -83,6 +85,12 @@ function Group:GetEntities()
     return self.__entities
 end
 
+function Group:Test_GetEntities()
+    for key, value in pairs(self:GetEntities()) do
+        print(self.__test_id, key)
+    end
+end
+
 -----------------------------------------------------------------------------------------------------------------------
 -- Group 私有方法
 -----------------------------------------------------------------------------------------------------------------------
@@ -101,6 +109,9 @@ end
 ---@param e Entity
 ---@param comp_id integer
 function Group:_OnAddComponent(e, comp_id)
+    if self.mUpdated == true then
+        return
+    end
     if self:_MatchEntity(e) then
         self.mEntityIndexer[e.mUID] = true
         self.mIsDirty = true

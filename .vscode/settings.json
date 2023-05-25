@@ -10,6 +10,7 @@
     ],
     "workbench.tree.indent": 24,
     "Lua.diagnostics.globals": [
-        "_TABLE"
+        "_TABLE",
+        "GameComponentLookUp"
     ]
 }
