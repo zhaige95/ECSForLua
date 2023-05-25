@@ -1,4 +1,2 @@
-local data = {
-    
-}
+local data = {}
 return data

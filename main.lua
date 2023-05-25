@@ -9,6 +9,8 @@ Context:Init()
 local group = Context:GetGroup(NewMatcher():AllOf(EMatcher.Test):Updated():Removed())
 local group2 = Context:GetGroup(NewMatcher():AllOf(1, 2))
 
+
+
 local e = Context:CreateEntity()
 e:AddTest("new  test", { 523 })
 

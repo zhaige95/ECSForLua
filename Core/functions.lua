@@ -38,3 +38,11 @@ function split(input, delimiter)
     table.insert(arr, string.sub(input, pos))
     return arr
 end
+
+---table是否为{}
+---@param t any
+---@return boolean
+function table_is_empty(t)
+    return _G.next( t ) == nil
+  end
+  

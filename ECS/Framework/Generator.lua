@@ -58,6 +58,9 @@ return [Name]
     local param = ''
 
     for r in file:lines() do
+        if table_is_empty(script) then
+            break
+        end
         index = index + 1
         if index >= 2 then
             if r == '}' then
@@ -66,7 +69,7 @@ return [Name]
             line = r
             line = line:gsub(' ', '')
             line = line:gsub('\n', '')
-            if line == '' then
+            if line == '' then   -- 处理空行
                 goto continue
             end
             if line:sub(#line) == ',' then
