@@ -1,15 +1,15 @@
 require("Core.functions")
-
 require("ECS.Framework.Context")
-
 require("ECS.Generated.GameContext")
+
+local FratureUpdate = require("ECS.FeatureUpdate")
 
 Context:Init()
 
 local group = Context:GetGroup(NewMatcher():AllOf(EMatcher.Test):Updated():Removed())
 local group2 = Context:GetGroup(NewMatcher():AllOf(1, 2))
 
-
+FratureUpdate:new()
 
 local e = Context:CreateEntity()
 e:AddTest("new  test", { 523 })
@@ -18,8 +18,8 @@ print("-------------------")
 group:Test_GetEntities()
 group2:Test_GetEntities()
 
-
 --- Loop 1 ------------------------------------------------------------------------
+FratureUpdate:Execute(16)
 Context:Clear()
 
 local move = Context:CreateEntity()
@@ -32,6 +32,7 @@ group2:Test_GetEntities()
 
 
 --- Loop 2 ------------------------------------------------------------------------
+FratureUpdate:Execute(16)
 Context:Clear()
 
 e:RemoveTest()
@@ -40,6 +41,11 @@ print("-------------------")
 group:Test_GetEntities()
 group2:Test_GetEntities()
 
+
+
+--- Loop 3 ------------------------------------------------------------------------
+FratureUpdate:Execute(16)
+Context:Clear()
 
 
 
