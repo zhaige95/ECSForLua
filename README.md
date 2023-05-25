@@ -48,12 +48,8 @@ for key, entity in pairs(self.group:GetEntities()) do
 end
 ```
 
+    Tips：相同匹配规则的group实例只会存在一个，使用时建议初始化时创建好group并保存引用，避免在运行时频繁创建新规则group
 
-```
-
-Tips：相同匹配规则的group实例只会存在一个，使用时建议初始化时创建好group并保存引用，避免在运行时频繁创建新规则group
-
-```
 
 ## 创建 Component：
 
