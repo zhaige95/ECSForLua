@@ -26,26 +26,25 @@ function Context:Init()
     --- 实体列表
     self.mEntityList = {}
     --- 过滤组列表
-    self.mGroupMap_Comp = {} -- 由组件id索引
+    self.mGroupList = {}    -- 由group id索引
+    --[[
+
+    ]]
+    self.mGroupMap_Comp = {} -- 由组件id索引，有重复
     --[[
         mGroupMap_Comp = {
             [1] = {...},
             [10] = {...}
         }
     ]]
-    self.mGroupMap_Key = {} -- 由Added、Removed动作和数字id索引
+    -- self.mGroupMap_Act = {} -- 由Added、Removed动作和数字id索引，有重复
     --[[
-        mGroupMap_Key = {
-            [onAdd:true] = {
-                [onRemove:true] = {
-                    [56] = {...},
-                    [105] = {...},
-                    ...
-                }
+        mGroupMap_Act = {
+            OnAdd = {
+                [5612] = { ... }
             },
-            [onAdd:false] = {
-                [onRemove:true] = { ... }
-            }
+            OnRemoved = {},
+            OnUpdate = {}
         }
     ]]
     --- 实体UID，自增
@@ -76,12 +75,11 @@ function Context:_InitGroupData()
         self.mGroupMap_Comp[value] = {}
     end
 
-    self.mGroupMap_Key[true] = {}
-    self.mGroupMap_Key[false] = {}
-    self.mGroupMap_Key[true][true] = {}
-    self.mGroupMap_Key[true][false] = {}
-    self.mGroupMap_Key[false][false] = {}
-    self.mGroupMap_Key[false][true] = {}
+    -- self.mGroupMap_Act.Globle = {}
+    -- self.mGroupMap_Act.Added = {}
+    -- self.mGroupMap_Act.Removed = {}
+    -- self.mGroupMap_Act.Updated = {}
+
 end
 
 -----------------------------------------------------------------------------------------------------------------------
@@ -174,6 +172,14 @@ function Context:_OnRemoveComponent(e, component)
     end
 end
 
+
+function Context:_OnUpdateComponent(e, component)
+    local id = component.__id
+    for key, group in pairs(self.mGroupMap_Comp[id]) do
+        group:_OnUpdateComponent(e, id)
+    end
+end
+
 -----------------------------------------------------------------------------------------------------------------------
 -- System 系统相关
 -----------------------------------------------------------------------------------------------------------------------
@@ -193,47 +199,77 @@ end
 ---@param matcher Matcher 匹配器
 ---@return Group 过滤组实例
 function Context:GetGroup(matcher)
+    if nil == matcher then return nil end 
     local group = nil
     local id = Context:_GenerateGroupID(matcher)
 
-    if self.mGroupMap_Key[matcher.mAdded][matcher.mRemoved] then
-        local _set = self.mGroupMap_Key[matcher.mAdded][matcher.mRemoved][id]
-        if _set then
-            for _, value in pairs(_set) do
-                if value:_Match(matcher) then
-                    group = value
-                    break
-                end
+    -- 找出已有的group
+    if self.mGroupList[id] then
+        for key, g in pairs(self.mGroupList[id]) do
+            if g:_Match(matcher) == true then
+                group = g
+                break
             end
         end
     end
 
+    -- 创建新的group
     if nil == group then
         group = Group.new(id, matcher)
-        if nil == self.mGroupMap_Key[group.mAdded][group.mRemoved][id] then
-            self.mGroupMap_Key[group.mAdded][group.mRemoved][id] = {}
+        -- 加入id索引列表
+        if nil == self.mGroupList[id] then
+            self.mGroupList[id] = {}
         end
-        table.insert(self.mGroupMap_Key[group.mAdded][group.mRemoved][id], group)
+        table.insert(self.mGroupList[id], group)
+
+        -- 加入组件索引列表
         for _, comp_id in pairs(matcher.mAllOfContent) do
             table.insert(self.mGroupMap_Comp[comp_id], group)
         end
         for _, comp_id in pairs(matcher.mNoneOfContent) do
             table.insert(self.mGroupMap_Comp[comp_id], group)
         end
+
+        -- 加入事件索引列表
+        -- if group.mAdded == false and group.mRemoved == false and group.mUpdated == false then
+        --     if nil == self.mGroupMap_Act.Globle[id] then
+        --         self.mGroupMap_Act.Globle[id] = {}
+        --     end
+        --     table.insert(self.mGroupMap_Act.Globle[id], group)
+        -- else
+        --     if group.mAdded == true then
+        --         if nil == self.mGroupMap_Act.Added[id] then
+        --             self.mGroupMap_Act.Added[id] = {}
+        --         end
+        --         table.insert(self.mGroupMap_Act.Added[id], group)
+        --     end
+        --     if group.mRemoved == true then
+        --         if nil == self.mGroupMap_Act.Removed[id] then
+        --             self.mGroupMap_Act.Removed[id] = {}
+        --         end
+        --         table.insert(self.mGroupMap_Act.Removed[id], group)
+        --     end
+        --     if group.mUpdated == true then
+        --         if nil == self.mGroupMap_Act.Updated[id] then
+        --             self.mGroupMap_Act.Updated[id] = {}
+        --         end
+        --         table.insert(self.mGroupMap_Act.Updated[id], group)
+        --     end
+        -- end
     end
 
     return group
 end
 
 ---生成过滤组id
----@param group Group 过滤组实例
+---@param matcher Matcher 匹配器实例
 ---@return integer id
-function Context:_GenerateGroupID(group)
+function Context:_GenerateGroupID(matcher)
     local id = 0
-    for index, value in ipairs(group.mAllOfContent) do
+    for index, value in ipairs(matcher.mAllOfContent) do
         id = id + value
     end
-    for index, value in ipairs(group.mNoneOfContent) do
+    for index, value in ipairs(matcher.mNoneOfContent) do
         id = id + value
     end
 

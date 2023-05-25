@@ -14,6 +14,7 @@ function Group:ctor(id, matcher)
     self.mIsDirty = true
     self.mAdded = matcher.mAdded
     self.mRemoved = matcher.mRemoved
+    self.mUpdated = matcher.mUpdated
     self.mAnyMode = matcher.mAnyMode
 
     for key, value in pairs(matcher.mAllOfContent) do
@@ -49,6 +50,7 @@ function Group:Reset()
 
     self.mAdded = false
     self.mRemoved = false
+    self.mUpdated = false
     self.mAnyMode = false
 
     self.mEntityIndexer = {}
@@ -109,13 +111,26 @@ function Group:_OnRemoveComponent(e, comp_id)
     end
 end
 
+---更新组件
+---@param e Entity
+---@param comp_id integer
+function Group:_OnUpdateComponent(e, comp_id)
+    if self.mUpdated == true then
+        if self:_MatchEntity(e) then
+            self.mEntityIndexer[e.mUID] = true
+            self.mIsDirty = true
+        end
+    end
+end
+
 ---匹配匹配器
 ---@param matcher Matcher
 ---@return boolean
 function Group:_Match(matcher)
     if self.mAdded ~= matcher.mAdded or
         self.mRemoved ~= matcher.mRemoved or
-        self.mAnyMode ~= matcher.mAnyMode
+        self.mAnyMode ~= matcher.mAnyMode or 
+        self.mUpdated ~= matcher.mUpdated
     then
         return false
     end
@@ -139,14 +154,17 @@ end
 ---@param e Entity
 ---@return boolean
 function Group:_MatchEntity(e)
+    local pass_all = self.mAnyMode == false
     for _, id in pairs(self.mAllOfContent) do
         if self.mAnyMode == true then
             if e:HasComponent(id) == true then
-                return true
+                pass_all = true
+                break
             end
-        end
-        if e:HasComponent(id) == false then
-            return false
+        else
+            if e:HasComponent(id) == false then
+                return false
+            end
         end
     end
     for _, id in pairs(self.mNoneOfContent) do
@@ -154,7 +172,7 @@ function Group:_MatchEntity(e)
             return false
         end
     end
-    return true
+    return pass_all
 end
 
 return Group

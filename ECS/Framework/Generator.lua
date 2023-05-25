@@ -189,6 +189,10 @@ print("----------- 生成GameContext代码 -------------------------------------
 
 local path_context = "ECS\\Generated\\GameContext.lua"
 local code_context = [[
+-------------------------------------------------------------------------------------------------
+-- 自动生成，请勿改动
+-------------------------------------------------------------------------------------------------
+
 GameComponentScript = {
 [REQ]
 }
@@ -196,18 +200,26 @@ GameComponentScript = {
 GameComponentLookUp = {
 [LOK]
 }
+
+--- 组件匹配id，和GameComponentLookUp保持一致，主要是为了书写简洁
+EMatcher = {
+[MAC]
+}
 ]]
 
 local req = ''
 local lok = ''
+local mac = ''
 local index = 1
 for key, value in pairs(entity_extention) do
     req = req .. string.format("    [%d] = require('ECS.Generated.Components.Game%s'),\n", index, key)
     lok = lok .. string.format("    %s = %d,\n", key, index)
+    mac = mac .. string.format("    %s = %d,\n", key:gsub('Component', ''), index)
     index = index + 1
 end
 code_context = code_context:gsub('%[REQ]', req)
 code_context = code_context:gsub('%[LOK]', lok)
+code_context = code_context:gsub('%[MAC]', mac)
 
 print(code_context)
 

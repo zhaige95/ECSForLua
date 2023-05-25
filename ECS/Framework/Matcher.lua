@@ -22,6 +22,7 @@ function Matcher:Reset()
 
     self.mAdded = false
     self.mRemoved = false
+    self.mUpdated = false
     self.mAnyMode = false
     return self
 end
@@ -49,6 +50,11 @@ end
 
 function Matcher:Removed()
     self.mRemoved = true
+    return self
+end
+
+function Matcher:Update()
+    self.mUpdated = true
     return self
 end
 
