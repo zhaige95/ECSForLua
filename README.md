@@ -53,19 +53,17 @@ end
 
 空数据组件：
 ```
-local data = {}
-return data
+return {}
 ```
 
 带数据的组件
 
 ```
-local data = {
+return {
     speed = 22,
     direction = {x = 0, y = 0, z = 0},
     isMoving = true
 }
-return data
 ```
 
 
@@ -82,6 +80,9 @@ local process = {
 ```
 
 运行Generator.lua脚本，生成GameComponent类和Entity扩展方法
+
+> **如果要删除旧组件，需要手动清空一下生成的组件代码，然后运行生成脚本，代码文件夹位置：ECS\Generated\Components** 
+
 
 ## 创建System
 
