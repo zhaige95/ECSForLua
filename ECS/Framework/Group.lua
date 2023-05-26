@@ -35,7 +35,7 @@ function Group:ctor(id, matcher)
             ...
         }
     ]]
-    self.__test_id = string.format("%d:%s:%s:%s —> ", self.mID, self.mAdded and 'add' or '_', self.mRemoved and 'removed' or '_',
+    self.__test_id = string.format("Group-%d:%s:%s:%s —> ", self.mID, self.mAdded and 'add' or '_', self.mRemoved and 'removed' or '_',
         self.mUpdated and 'updated' or '_')
 end
 

@@ -1,6 +1,4 @@
-local data = {
+return {
     id = "test",
     list
 }
-
-return data

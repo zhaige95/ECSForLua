@@ -35,7 +35,8 @@ group2:Test_GetEntities()
 FratureUpdate:Execute(16)
 Context:Clear()
 
-e:RemoveTest()
+e:UpdateTest()
+e:RemoveMove()
 
 print("-------------------")
 group:Test_GetEntities()

@@ -69,7 +69,7 @@ return [Name]
             line = r
             line = line:gsub(' ', '')
             line = line:gsub('\n', '')
-            if line == '' then   -- 处理空行
+            if line == '' then -- 处理空行
                 goto continue
             end
             if line:sub(#line) == ',' then

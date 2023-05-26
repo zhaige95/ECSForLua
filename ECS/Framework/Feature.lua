@@ -22,4 +22,12 @@ function Feature:Execute(dt)
     end
 end
 
+function Feature:OnDispose()
+    for key, value in ipairs(self.__systems) do
+        value:OnDispose()
+        self.__systems[key] = nil
+    end
+    self.__systems = {}
+end
+
 return Feature
