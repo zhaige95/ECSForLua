@@ -2,7 +2,7 @@ local _Base = require("ECS.Framework.System")
 local MoveSystem = class("MoveSystem", _Base)
 
 function MoveSystem:ctor()
-    self.group = Context:GetGroup(NewMatcher():AllOf(EMatcher.Test))
+    self.group = Context:GetGroup(NewMatcher():AllOf(EMatcher.Move))
 end
 
 function MoveSystem:Execute(dt)
