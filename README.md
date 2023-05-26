@@ -1,14 +1,15 @@
 # ECS For Lua
+## Lua版轻量级ECS框架
 
 ![输入图片说明](https://foruda.gitee.com/images/1685002685471243675/ea7d602a_5549484.png "GSZ6)J0]NG`({ARVYHKY412.png")
 
-## 初始化 Context
+## 1、初始化 Context
 
 ```
 Context:Init()
 ```
 
-## 使用匹配器Matcher和过滤组Group
+## 2、使用匹配器Matcher和过滤组Group
 
 #### （Matcher）匹配器：用来定义一个实体匹配规则
 
@@ -49,7 +50,7 @@ end
 ```
 
 
-## 创建 Component：
+## 3、创建 Component：
 
 空数据组件：
 ```
@@ -67,7 +68,7 @@ return {
 ```
 
 
-## 生成代码
+## 4、生成代码
 
 创建完组件后在 ECS\Framework\Generator.lua 的process表中加入组件代码的相对路径：
 
@@ -84,7 +85,7 @@ local process = {
 > **如果要删除旧组件，需要手动清空一下生成的组件代码，然后运行生成脚本，代码文件夹位置：ECS\Generated\Components** 
 
 
-## 创建System
+## 5、创建System
 
 继承System.lua，
 重写ctor和Execute方法
@@ -108,7 +109,7 @@ return MoveSystem
 
 ```
 
-## 创建Feature
+## 6、创建Feature
 
 继承Feature.lua，
 重写ctor方法，
@@ -127,11 +128,11 @@ end
 return FeatureUpdate
 ```
 
-## 使用Feature
+## 7、使用Feature
 
     在Update中调用Feature:Execute(dt)
 
-## 使用Entity
+## 8、使用Entity
 
 **创建Entity**
 
