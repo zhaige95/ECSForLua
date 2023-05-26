@@ -5,7 +5,7 @@
 
 ## 1、初始化 Context
 
-```
+```lua
 Context:Init()
 ```
 
@@ -15,23 +15,31 @@ Context:Init()
 
 比如：
 
-    实体拥有Move组件：NewMatcher():AllOf(EMatcher.Move)
 
-    实体拥有Move组件但是不能有Stun组件：NewMatcher():AllOf(EMatcher.Move):Noneof(EMatcher.Stun)
+```
+  实体拥有Move组件：NewMatcher():AllOf(EMatcher.Move, EMatcher.Camp1)
+
+  实体拥有Move组件但是不能有Stun组件：NewMatcher():AllOf(EMatcher.Move):Noneof(EMatcher.Stun)
+```
+
+
 
 支持规则：
 
-    AllOf(...)：必须拥有组件
 
-    NoneOf(...)：不包含组件
+```
+AllOf(...)：必须拥有组件
+
+NoneOf(...)：不包含组件
     
-    AnyOf(...)：包含任意组件，和AllOf规则互斥
+AnyOf(...)：包含任意组件，和AllOf规则互斥
 
-    Added()：组件添加时
+Added()：组件添加时
 
-    Removed()：组件移除时
+Removed()：组件移除时
 
-    Updated()：组件更新数据时，需要使用实体上的UpdateXXX(...)方法才能触发
+Updated()：组件更新数据时，需要使用实体上的UpdateXXX(...)方法才能触发
+```
 
 #### （Group）过滤组：用来管理匹配到规则的实体
 
