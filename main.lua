@@ -7,7 +7,7 @@ local FratureUpdate = require("ECS.FeatureUpdate")
 Context:Init()
 
 local group = Context:GetGroup(NewMatcher():AllOf(EMatcher.Test):Updated():Removed())
-local group2 = Context:GetGroup(NewMatcher():AllOf(1, 2))
+local group2 = Context:GetGroup(NewMatcher():AllOf(EMatcher.Test, EMatcher.Move))
 
 FratureUpdate:new()
 
@@ -36,7 +36,7 @@ FratureUpdate:Execute(16)
 Context:Clear()
 
 e:UpdateTest()
-e:RemoveMove()
+move:RemoveMove()
 
 print("-------------------")
 group:Test_GetEntities()

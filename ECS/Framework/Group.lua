@@ -109,7 +109,7 @@ end
 ---@param e Entity
 ---@param comp_id integer
 function Group:_OnAddComponent(e, comp_id)
-    if self.mUpdated == true then
+    if self.mUpdated == true or self.mRemoved == true then
         return
     end
     if self:_MatchEntity(e) then
