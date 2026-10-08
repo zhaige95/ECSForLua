@@ -115,6 +115,9 @@ function Group:_OnAddComponent(e, comp_id)
     if self:_MatchEntity(e) then
         self.mEntityIndexer[e.mUID] = true
         self.mIsDirty = true
+    elseif self.mAdded == false then
+        -- 普通组：新增组件导致不再匹配（如命中 NoneOf）时，移除残留成员
+        self:_RemoveEntityCache(e.mUID)
     end
 end
 
@@ -127,9 +130,32 @@ function Group:_OnRemoveComponent(e, comp_id)
             self.mEntityIndexer[e.mUID] = true
             self.mIsDirty = true
         end
+    elseif self.mAdded == false then
+        -- 普通组：重新评估成员。生成代码先通知后摘除组件，
+        -- 匹配时需把 comp_id 视为已移除（移除 NoneOf 组件后实体可能重新匹配）
+        if self:_MatchEntity(e, comp_id) then
+            if self.mEntityIndexer[e.mUID] ~= true then
+                self.mEntityIndexer[e.mUID] = true
+                self.mIsDirty = true
+            end
+        else
+            self:_RemoveEntityCache(e.mUID)
+        end
     else
-        self.mEntityIndexer[e.mUID] = nil
+        self:_RemoveEntityCache(e.mUID)
     end
+end
+
+---从组内移除实体，索引和实体对象缓存都要清理，并标记脏
+---@param uid integer
+function Group:_RemoveEntityCache(uid)
+    if self.mEntityIndexer[uid] then
+        self.mEntityIndexer[uid] = nil
+    end
+    if self.__entities[uid] then
+        self.__entities[uid] = nil
+    end
+    self.mIsDirty = true
 end
 
 ---更新组件
@@ -173,23 +199,26 @@ end
 
 ---匹配实体
 ---@param e Entity
+---@param except_comp_id integer|nil 视为已移除的组件id（移除通知时组件尚未从实体摘除）
 ---@return boolean
-function Group:_MatchEntity(e)
+function Group:_MatchEntity(e, except_comp_id)
     local pass_all = self.mAnyMode == false
     for _, id in pairs(self.mAllOfContent) do
+        -- 被移除的组件视为不存在
+        local has = id ~= except_comp_id and e:HasComponent(id) == true
         if self.mAnyMode == true then
-            if e:HasComponent(id) == true then
+            if has == true then
                 pass_all = true
                 break
             end
         else
-            if e:HasComponent(id) == false then
+            if has == false then
                 return false
             end
         end
     end
     for _, id in pairs(self.mNoneOfContent) do
-        if e:HasComponent(id) == true then
+        if id ~= except_comp_id and e:HasComponent(id) == true then
             return false
         end
     end
